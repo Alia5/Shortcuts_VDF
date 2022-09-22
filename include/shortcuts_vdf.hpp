@@ -148,43 +148,23 @@ struct VDFValue {
     }
 };
 
-static inline const nlohmann::fifo_map<std::string, VDFValue> DEFAULT_SHORTCUT_MAP = {
-    { k_appid,                  {VDFTypeId::Number, 0}},
-    { k_appname,                {VDFTypeId::String, ""}},
-    { k_exe,                    {VDFTypeId::String, "\"\""}},
-    { k_StartDir,               {VDFTypeId::String, "\"\""}},
-    { k_icon,                   {VDFTypeId::String, "\"\""}},
-    { k_ShortcutPath,           {VDFTypeId::String, "\"\""}},
-    { k_LaunchOptions,          {VDFTypeId::String, ""}},
-    { k_IsHidden,               {VDFTypeId::Number, ""}},
-    { k_AllowDesktopConfig,     {VDFTypeId::Number, 0}},
-    { k_AllowOverlay,           {VDFTypeId::Number, 1}},
-    { k_openvr,                 {VDFTypeId::Number, 0}},
-    { k_Devkit,                 {VDFTypeId::Number, 0}},
-    { k_DevkitGameID,           {VDFTypeId::String, ""}},
-    { k_DevkitOverrideAppID,    {VDFTypeId::Number, 0}},
-    { k_LastPlayTime,           {VDFTypeId::Number, ""}},
-    { k_FlatpakAppID,           {VDFTypeId::String, ""}},
-    { k_tags,                   {VDFTypeId::Map, nlohmann::fifo_map < std::string, VDFValue >()}},
-};
-
 struct Shortcut {
-    uint32_t appid{};
+	uint32_t appid{ 000000 };
     std::string appname;
-    std::string exe;
-    std::string StartDir;
-    std::string icon;
-    std::string ShortcutPath;
-    std::string LaunchOptions;
-    uint32_t IsHidden{};
-    uint32_t AllowDesktopConfig{};
-    uint32_t AllowOverlay{};
-    uint32_t openvr{};
-    uint32_t Devkit{};
-    std::string DevkitGameID;
-    uint32_t DevkitOverrideAppID{};
-    uint32_t LastPlayTime{};
-    std::string FlatpakAppID;
+    std::string exe{ "\"\"" };
+    std::string StartDir{ "\"\"" };
+    std::string icon{ "\"\"" };
+    std::string ShortcutPath{ "\"\"" };
+    std::string LaunchOptions{ "\"\"" };
+    uint32_t IsHidden{0};
+    uint32_t AllowDesktopConfig{0};
+    uint32_t AllowOverlay{1};
+    uint32_t openvr{0};
+    uint32_t Devkit{0};
+    std::string DevkitGameID{""};
+    uint32_t DevkitOverrideAppID{0};
+    uint32_t LastPlayTime{0};
+    std::string FlatpakAppID{""};
     std::vector<std::string> tags;
 
     nlohmann::fifo_map<std::string, VDFValue> unsupported_keys;
@@ -192,7 +172,7 @@ struct Shortcut {
     Shortcut() = default;
     explicit Shortcut(const nlohmann::fifo_map<std::string, VDFValue>& vdf_map) : Shortcut()
     {
-        for (const auto& [key, value] : (vdf_map.empty() ? DEFAULT_SHORTCUT_MAP : vdf_map)) {
+        for (const auto& [key, value] : vdf_map) {
             switch (value.type) {
             case Number: {
                 switch (internal::str2int(key.c_str())) {
