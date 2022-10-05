@@ -32,6 +32,14 @@ namespace internal {
     {
         return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
     }
+    inline constexpr std::string str_tolower(const std::string& s) {
+        std::string res;
+		res.resize(s.size());
+        std::ranges::transform(s.begin(), s.end(), res.begin(),
+            [](auto c) { return std::tolower(c); }
+        );
+        return res;
+    }
 }
 
 
@@ -173,83 +181,95 @@ struct Shortcut {
     explicit Shortcut(const nlohmann::fifo_map<std::string, VDFValue>& vdf_map) : Shortcut()
     {
         for (const auto& [key, value] : vdf_map) {
+            const auto lowerKey = internal::str_tolower(key);
             switch (value.type) {
             case Number: {
-                switch (internal::str2int(key.c_str())) {
-                case internal::str2int(k_appid):
-                    appid = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_IsHidden):
-                    IsHidden = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_AllowDesktopConfig):
-                    AllowDesktopConfig = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_AllowOverlay):
-                    AllowOverlay = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_openvr):
-                    openvr = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_Devkit):
-                    Devkit = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_DevkitOverrideAppID):
-                    DevkitOverrideAppID = std::any_cast<uint32_t>(value.value);
-                    break;
-                case internal::str2int(k_LastPlayTime):
-                    LastPlayTime = std::any_cast<uint32_t>(value.value);
-                    break;
-                default:
-                    unsupported_keys[key] = value;
-                    break;
-                }
+                    if (lowerKey == internal::str_tolower(k_appid))
+                    {
+						appid = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_IsHidden))
+					{
+						IsHidden = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_AllowDesktopConfig))
+					{
+						AllowDesktopConfig = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_AllowOverlay))
+					{
+						AllowOverlay = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_openvr))
+					{
+						openvr = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_Devkit))
+					{
+						Devkit = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_DevkitOverrideAppID))
+					{
+						DevkitOverrideAppID = std::any_cast<uint32_t>(value.value);
+					}
+					else if (lowerKey == internal::str_tolower(k_LastPlayTime))
+					{
+						LastPlayTime = std::any_cast<uint32_t>(value.value);
+					}
+					else
+					{
+						unsupported_keys.emplace(key, value);
+                    }
                 break;
             case String: {
-                switch (internal::str2int(key.c_str())) {
-                case internal::str2int(k_appname):
-                    appname = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_exe):
-                    exe = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_StartDir):
-                    StartDir = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_icon):
-                    icon = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_ShortcutPath):
-                    ShortcutPath = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_LaunchOptions):
-                    LaunchOptions = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_DevkitGameID):
-                    DevkitGameID = std::any_cast<std::string>(value.value);
-                    break;
-                case internal::str2int(k_FlatpakAppID):
-                    FlatpakAppID = std::any_cast<std::string>(value.value);
-                    break;
-                default:
-                    unsupported_keys[key] = value;
-                    break;
+                if (lowerKey == internal::str_tolower(k_appname))
+                {
+					appname = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_exe))
+				{
+					exe = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_StartDir))
+				{
+					StartDir = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_icon))
+				{
+					icon = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_ShortcutPath))
+				{
+					ShortcutPath = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_LaunchOptions))
+				{
+					LaunchOptions = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_DevkitGameID))
+				{
+					DevkitGameID = std::any_cast<std::string>(value.value);
+				}
+				else if (lowerKey == internal::str_tolower(k_FlatpakAppID))
+				{
+					FlatpakAppID = std::any_cast<std::string>(value.value);
+				}
+				else
+				{
+					unsupported_keys.emplace(key, value);
                 }
-                break;
             }
             case Map: {
-                switch (internal::str2int(key.c_str())) {
-                case internal::str2int(k_tags): {
+                if (lowerKey == internal::str_tolower(k_tags))
+                {
                     for (const auto& [type, tag] : std::any_cast<nlohmann::fifo_map<std::string, VDFValue>>(value.value) | std::views::values) {
                         if (type == String) {
                             tags.push_back(std::any_cast<std::string>(tag));
                         }
                     }
-                    break;
-                }
-                default:
+                } else
+                {
                     unsupported_keys[key] = value;
-                    break;
                 }
                 break;
             }
